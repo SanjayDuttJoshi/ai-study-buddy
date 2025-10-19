@@ -67,7 +67,7 @@ def init_db():
     Call this on application startup in main.py
     """
     # Import all models here so SQLAlchemy knows about them
-    from .models import User  # noqa
+    from .models import User, HealthCheck  # noqa
     # Import future models as needed:
     # from .models import Note, Summary, Quiz, QuizAttempt, ChatMessage
     
