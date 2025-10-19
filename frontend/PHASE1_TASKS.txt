@@ -1,0 +1,255 @@
+===========================================
+PHASE 1: FRONTEND - LOGIN & REGISTRATION UI
+===========================================
+
+TEAM: 2 Frontend Developers
+GOAL: Build beautiful login and registration interface
+TIMELINE: Phase 1 completion
+
+-------------------------------------------
+WHAT WE'RE BUILDING
+-------------------------------------------
+
+Pages:
+1. Login Page       → Username + Password → Get JWT token
+2. Registration Page → Username + Email + Password → Create account
+3. Main Dashboard   → Show after successful login
+4. Session Management → Keep user logged in
+
+Features:
+- Form validation (email format, password length)
+- Error messages (user-friendly)
+- Success messages & animations
+- Loading states (spinners)
+- Logout functionality
+- Session persistence
+
+-------------------------------------------
+REQUIREMENTS
+-------------------------------------------
+
+Already in requirements.txt:
+- streamlit==1.30.0    # UI framework
+- requests==2.31.0     # For API calls
+
+Make sure backend is running on: http://localhost:8000
+
+-------------------------------------------
+FOLDER STRUCTURE TO CREATE (Modular Design)
+-------------------------------------------
+
+frontend/
+├── utils/                    # Shared utilities
+│   ├── __init__.py
+│   ├── api_client.py         # Backend API communication
+│   └── session.py            # Session state management
+├── pages/                    # Feature-based pages
+│   ├── __init__.py
+│   ├── login.py              # LOGIN FEATURE: Login form UI
+│   ├── register.py           # REGISTER FEATURE: Registration form UI
+│   ├── dashboard.py          # DASHBOARD: Main page after login
+│   └── (Future: notes.py, summaries.py, chat.py, quizzes.py)
+└── app.py                    # ONLY routing & navigation (minimal)
+
+PRINCIPLE: Each feature = One page file
+- app.py → Routing logic only (if authenticated → dashboard, else → login)
+- login.py → Complete login UI & logic
+- register.py → Complete registration UI & logic  
+- dashboard.py → Dashboard UI after login
+- Each page is self-contained and focused!
+
+WHY MODULAR?
+✓ app.py stays clean (no huge file with 1000+ lines)
+✓ Easy to find UI code (login UI? check login.py)
+✓ Easy to test (test login? just load login.py)
+✓ Reusable (import login.show() anywhere)
+✓ Team-friendly (Person A on login.py, Person B on dashboard.py)
+✓ Future-proof (add chat? just add chat.py)
+
+-------------------------------------------
+TASK DIVISION
+-------------------------------------------
+
+PERSON A - API Integration & Session:
+---------------------------------
+Tasks:
+1. Create utils/api_client.py
+   - APIClient class
+   - register() method → Call POST /auth/register
+   - login() method → Call POST /auth/login
+   - get_current_user() method → Call GET /auth/me
+   - Error handling for API calls
+   
+2. Create utils/session.py
+   - init_session() → Initialize session state
+   - login_user() → Save token and username
+   - logout_user() → Clear session
+   - is_authenticated() → Check login status
+   - get_token() → Get current token
+
+What to learn:
+- Python requests library
+- REST API communication
+- Session state management
+- JWT token handling
+
+Resources:
+- Requests docs: https://requests.readthedocs.io/
+- Streamlit session state: https://docs.streamlit.io/library/api-reference/session-state
+
+
+PERSON B - UI Components (Feature-based Pages):
+---------------------------------
+Tasks:
+1. Create pages/login.py (LOGIN feature page)
+   - show() function to display login form
+   - Username & Password inputs
+   - Form validation
+   - Call api_client.login()
+   - Handle success → save session → switch to dashboard
+   - Show error messages
+   
+2. Create pages/register.py (REGISTER feature page)
+   - show() function to display registration form
+   - Username, Email, Password, Confirm inputs
+   - Form validation (length, email format, password match)
+   - Call api_client.register()
+   - Show success message
+   - Guide user to login page
+   
+3. Create pages/dashboard.py (DASHBOARD feature page)
+   - show() function to display main dashboard
+   - Welcome message with username
+   - User profile info
+   - Logout button
+   - Placeholder for Phase 2 features
+   
+4. Update app.py (MINIMAL - only routing)
+   - Import all pages (login, register, dashboard)
+   - Check if authenticated
+   - If NOT authenticated → Show tabs (Login/Register)
+   - If authenticated → Show dashboard
+   - Handle page navigation
+   - Keep app.py SHORT and CLEAN
+
+What to learn:
+- Streamlit forms and inputs
+- Custom CSS styling
+- User experience (UX) design
+- Form validation
+
+Resources:
+- Streamlit docs: https://docs.streamlit.io/
+- Streamlit forms: https://docs.streamlit.io/library/api-reference/control-flow/st.form
+
+-------------------------------------------
+VALIDATION RULES
+-------------------------------------------
+
+Registration:
+- Username: 3-50 characters
+- Email: Must contain @
+- Password: Minimum 6 characters
+- Confirm password must match
+
+Login:
+- Username: Required
+- Password: Required
+
+All forms:
+- Show helpful error messages
+- Disable submit during API call
+- Show success message after action
+
+-------------------------------------------
+USER FLOW (Page Navigation)
+-------------------------------------------
+
+1. User opens app (app.py checks authentication)
+   → NOT authenticated → Show Login/Register tabs
+   
+2. NEW USER PATH:
+   - Click Register tab → pages/register.py shows
+   - Fill form → Validate → Call API → Success message
+   - Switch to Login tab → pages/login.py shows
+   
+3. EXISTING USER PATH:
+   - Stay on Login tab → pages/login.py shows
+   - Enter credentials → Call API → Get token
+   - Token saved via session.login_user()
+   - app.py detects authenticated → Show dashboard
+   
+4. LOGGED IN:
+   - pages/dashboard.py shows
+   - Display user info (from session)
+   - Can navigate (future: notes, summaries, etc.)
+   - Logout button → session.logout_user()
+   - app.py detects NOT authenticated → Back to login
+
+FILE FLOW:
+app.py → checks auth → routes to correct page
+pages/login.py → handles login
+pages/register.py → handles registration  
+pages/dashboard.py → main app after login
+
+-------------------------------------------
+TESTING CHECKLIST
+-------------------------------------------
+
+Together test:
+□ Frontend starts without errors
+□ Login form displays correctly
+□ Registration form displays correctly
+□ Form validation works (show errors)
+□ Can register new user (success message)
+□ Can login with created account
+□ Token is stored in session
+□ Redirects to main app after login
+□ User info displays correctly
+□ Session persists on page refresh
+□ Logout button works
+□ Returns to login after logout
+
+Test at: http://localhost:8501
+
+-------------------------------------------
+SUCCESS CRITERIA
+-------------------------------------------
+
+✓ Beautiful, professional-looking UI
+✓ All forms work perfectly
+✓ Validation prevents bad input
+✓ Successfully communicates with backend
+✓ Token stored and used correctly
+✓ Session management works
+✓ User-friendly error messages
+✓ Smooth user experience
+
+-------------------------------------------
+COMMON CHALLENGES
+-------------------------------------------
+
+1. Backend not connecting → Check backend is running (port 8000)
+2. Session not persisting → Make sure init_session() is called
+3. Forms not clearing → Use clear_on_submit=True
+4. Page not refreshing → Use st.rerun() after state changes
+5. API errors → Check request format (JSON vs form-data)
+
+-------------------------------------------
+UI/UX TIPS
+-------------------------------------------
+
+Good Practices:
+✓ Always show loading spinner during API calls
+✓ Use emojis for visual appeal (✅ ❌ 👤 🔐)
+✓ Color-code messages (green=success, red=error, blue=info)
+✓ Clear error messages ("Username already exists" not "400 error")
+✓ Celebrate success (st.balloons() after registration!)
+✓ Use st.expander() for additional info
+✓ Good spacing between elements
+
+
+===========================================
+LEARN, BUILD, MAKE IT BEAUTIFUL! 🎨
+===========================================
+
