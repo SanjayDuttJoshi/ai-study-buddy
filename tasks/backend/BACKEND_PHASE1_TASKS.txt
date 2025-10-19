@@ -1,0 +1,408 @@
+===========================================
+PHASE 1: BACKEND - USER AUTHENTICATION API
+===========================================
+
+TEAM: 2 Backend Developers
+GOAL: Build secure authentication API with JWT
+TIMELINE: Phase 1 completion
+
+-------------------------------------------
+WHAT WE'RE BUILDING
+-------------------------------------------
+
+API Endpoints:
+1. POST /auth/register  → Create new user account
+2. POST /auth/login     → Login and get JWT token
+3. GET  /auth/me        → Get current user info (protected)
+4. POST /auth/logout    → Logout (optional, for token blacklist)
+
+Features:
+- User registration with validation
+- Password hashing (bcrypt)
+- JWT token generation
+- Token verification
+- Protected routes
+- CORS configuration
+
+-------------------------------------------
+REQUIREMENTS
+-------------------------------------------
+
+Already in requirements.txt:
+- fastapi==0.109.0
+- uvicorn[standard]==0.27.0
+- sqlalchemy==2.0.25
+- bcrypt==4.1.2
+- pydantic==2.5.3
+
+Need to add:
+- python-jose[cryptography]==3.3.0  # For JWT
+- passlib[bcrypt]==1.7.4            # For password hashing
+- python-multipart==0.0.6           # For form data
+
+-------------------------------------------
+FOLDER STRUCTURE (Modular Design)
+-------------------------------------------
+
+backend/
+├── app/
+│   ├── models/              # Database models
+│   │   ├── __init__.py
+│   │   └── user.py          ✅ ALREADY CREATED
+│   ├── routers/             # API routes (one per feature)
+│   │   ├── __init__.py
+│   │   └── auth.py          ⚠️ CREATE THIS (all auth endpoints here)
+│   ├── schemas/             # Pydantic schemas
+│   │   ├── __init__.py
+│   │   └── user.py          ⚠️ CREATE THIS (request/response models)
+│   ├── utils/               # Helper functions
+│   │   ├── __init__.py
+│   │   ├── auth.py          ⚠️ CREATE THIS (password hashing, JWT)
+│   │   └── dependencies.py  ⚠️ CREATE THIS (get_current_user dependency)
+│   ├── database.py          ✅ ALREADY CREATED
+│   └── __init__.py
+└── main.py                  ✅ ALREADY CREATED (need to add routers)
+
+-------------------------------------------
+TASK DIVISION (2 DEVELOPERS)
+-------------------------------------------
+
+👤 BACKEND DEVELOPER 1: Database & Auth Logic
+-------------------------------------------
+Focus: Data layer + Auth utilities
+
+Tasks:
+1. Create Pydantic Schemas (app/schemas/user.py)
+   - UserCreate (for registration)
+   - UserLogin (for login)
+   - UserResponse (for responses)
+   - Token schema
+
+2. Create Auth Utilities (app/utils/auth.py)
+   - Hash password function
+   - Verify password function
+   - Create JWT token function
+   - Decode JWT token function
+
+3. Create Dependencies (app/utils/dependencies.py)
+   - get_current_user (extract user from JWT)
+   - get_db (already in database.py, might need import)
+
+File to create: 
+- backend/app/schemas/__init__.py
+- backend/app/schemas/user.py
+- backend/app/utils/__init__.py
+- backend/app/utils/auth.py
+- backend/app/utils/dependencies.py
+
+👤 BACKEND DEVELOPER 2: API Routes
+-------------------------------------------
+Focus: API endpoints + Router
+
+Tasks:
+1. Create Auth Router (app/routers/auth.py)
+   - POST /auth/register endpoint
+   - POST /auth/login endpoint
+   - GET /auth/me endpoint (protected)
+   - Add proper error handling
+   - Add validation
+
+2. Update main.py
+   - Import auth router
+   - Include router: app.include_router(auth.router)
+   - Add CORS middleware (if not already)
+
+3. Test all endpoints
+   - Use FastAPI docs (/docs)
+   - Test registration
+   - Test login
+   - Test protected route
+
+File to create:
+- backend/app/routers/auth.py
+
+File to update:
+- backend/main.py
+
+-------------------------------------------
+DETAILED IMPLEMENTATION GUIDE
+-------------------------------------------
+
+1️⃣ SCHEMAS (Developer 1)
+-------------------------------------------
+File: backend/app/schemas/user.py
+
+What to include:
+- UserCreate: username, email, password
+- UserLogin: username, password
+- UserResponse: id, username, email (NO password!)
+- Token: access_token, token_type
+
+Use Pydantic BaseModel for validation.
+
+2️⃣ AUTH UTILS (Developer 1)
+-------------------------------------------
+File: backend/app/utils/auth.py
+
+Functions needed:
+a) hash_password(password: str) -> str
+   - Use bcrypt to hash passwords
+   - Never store plain passwords!
+
+b) verify_password(plain: str, hashed: str) -> bool
+   - Compare plain password with hashed
+
+c) create_access_token(data: dict) -> str
+   - Create JWT token
+   - Set expiration time (30 minutes)
+   - Use SECRET_KEY from environment
+
+d) decode_access_token(token: str) -> dict
+   - Decode JWT token
+   - Verify signature
+   - Check expiration
+
+Important:
+- Use environment variables for SECRET_KEY
+- Add token expiration
+- Handle errors properly
+
+3️⃣ DEPENDENCIES (Developer 1)
+-------------------------------------------
+File: backend/app/utils/dependencies.py
+
+Function needed:
+- get_current_user(token: str, db: Session)
+  - Extract token from Authorization header
+  - Decode token
+  - Get user from database
+  - Return user or raise 401 error
+
+This is used to protect routes.
+
+4️⃣ AUTH ROUTER (Developer 2)
+-------------------------------------------
+File: backend/app/routers/auth.py
+
+Endpoints:
+
+a) POST /auth/register
+   - Accept: username, email, password
+   - Validate: email format, password length
+   - Check: username/email not already exists
+   - Hash password
+   - Create user in database
+   - Return: user info (no password!)
+
+b) POST /auth/login
+   - Accept: username, password
+   - Find user by username
+   - Verify password
+   - Create JWT token
+   - Return: token
+
+c) GET /auth/me
+   - Protected route (requires JWT)
+   - Use get_current_user dependency
+   - Return: current user info
+
+5️⃣ UPDATE MAIN.PY (Developer 2)
+-------------------------------------------
+File: backend/main.py
+
+Add:
+- Import auth router
+- Include router: app.include_router(auth.router)
+- CORS middleware (if not already there)
+
+-------------------------------------------
+TESTING YOUR WORK
+-------------------------------------------
+
+1. Start Backend:
+   cd backend
+   python3 -m uvicorn main:app --reload
+
+2. Open FastAPI Docs:
+   http://localhost:8000/docs
+
+3. Test Each Endpoint:
+   a) POST /auth/register
+      - Create a test user
+      - Should return user info (no password)
+   
+   b) POST /auth/login
+      - Login with created user
+      - Should return JWT token
+   
+   c) GET /auth/me
+      - Click "Authorize" button
+      - Enter token: "Bearer <your_token>"
+      - Should return your user info
+
+-------------------------------------------
+COORDINATION BETWEEN DEVELOPERS
+-------------------------------------------
+
+Developer 1 (Auth Logic) should finish first:
+1. Create schemas
+2. Create auth utilities
+3. Create dependencies
+4. Commit and push
+
+Developer 2 (API Routes) waits for Developer 1:
+1. Pull Developer 1's code
+2. Use their schemas and utilities
+3. Create auth router
+4. Update main.py
+5. Test everything
+6. Commit and push
+
+OR work in parallel:
+- Developer 1: Create schemas/utils
+- Developer 2: Create router structure with TODO comments
+- After Developer 1 finishes, Developer 2 fills in the TODOs
+
+-------------------------------------------
+ERROR HANDLING
+-------------------------------------------
+
+Common errors to handle:
+1. Username already exists → 400 Bad Request
+2. Email already exists → 400 Bad Request
+3. Invalid credentials → 401 Unauthorized
+4. Token expired → 401 Unauthorized
+5. Invalid token → 401 Unauthorized
+6. Missing required fields → 422 Unprocessable Entity
+
+Use FastAPI HTTPException:
+```python
+from fastapi import HTTPException
+
+raise HTTPException(
+    status_code=400,
+    detail="Username already exists"
+)
+```
+
+-------------------------------------------
+SECURITY BEST PRACTICES
+-------------------------------------------
+
+✅ DO:
+- Hash all passwords (use bcrypt)
+- Use strong SECRET_KEY (random, 32+ characters)
+- Set token expiration
+- Validate all inputs
+- Use HTTPS in production
+- Never log passwords
+
+❌ DON'T:
+- Store plain passwords
+- Return passwords in API responses
+- Use weak SECRET_KEY
+- Skip input validation
+- Allow SQL injection
+- Trust user input
+
+-------------------------------------------
+ENVIRONMENT VARIABLES
+-------------------------------------------
+
+Create .env file in backend/:
+```
+SECRET_KEY=your-super-secret-key-here-make-it-long-and-random
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+Add to .gitignore:
+```
+.env
+*.db
+```
+
+-------------------------------------------
+LEARNING RESOURCES
+-------------------------------------------
+
+1. FastAPI Authentication:
+   https://fastapi.tiangolo.com/tutorial/security/
+
+2. JWT Tokens:
+   https://jwt.io/
+
+3. Password Hashing:
+   https://passlib.readthedocs.io/
+
+4. Pydantic Validation:
+   https://docs.pydantic.dev/
+
+5. SQLAlchemy ORM:
+   https://docs.sqlalchemy.org/
+
+-------------------------------------------
+CHECKLIST
+-------------------------------------------
+
+Developer 1:
+□ Create backend/app/schemas/__init__.py
+□ Create backend/app/schemas/user.py with all schemas
+□ Create backend/app/utils/__init__.py
+□ Create backend/app/utils/auth.py with all auth functions
+□ Create backend/app/utils/dependencies.py
+□ Test password hashing works
+□ Test JWT creation/decoding works
+□ Commit and push code
+
+Developer 2:
+□ Pull Developer 1's code
+□ Create backend/app/routers/auth.py
+□ Implement POST /auth/register endpoint
+□ Implement POST /auth/login endpoint
+□ Implement GET /auth/me endpoint (protected)
+□ Update backend/main.py to include auth router
+□ Test all endpoints in /docs
+□ Verify registration creates user in DB
+□ Verify login returns valid token
+□ Verify /auth/me works with token
+□ Commit and push code
+
+Both:
+□ Update requirements.txt if needed
+□ Test on Windows and Linux
+□ Document any issues
+□ Help each other debug
+
+-------------------------------------------
+NOTES
+-------------------------------------------
+
+- User model is already created (backend/app/models/user.py)
+- Database is already configured (backend/app/database.py)
+- Focus on authentication ONLY in Phase 1
+- Other features (notes, quizzes) come in later phases
+- Coordinate with frontend team for API contract
+- Ask questions if anything is unclear!
+
+-------------------------------------------
+EXPECTED OUTPUT
+-------------------------------------------
+
+After Phase 1, you should have:
+✅ Working registration API
+✅ Working login API
+✅ JWT token generation
+✅ Protected routes with authentication
+✅ Password hashing
+✅ Proper error handling
+✅ All tested and working
+
+The frontend team will use your API to build the UI!
+
+===========================================
+QUESTIONS? CHECK docs/DATABASE_SETUP.md
+STUCK? READ docs/PROJECT_STRUCTURE.md
+LEARN, BUILD, SECURE IT! 🔐
+===========================================
+

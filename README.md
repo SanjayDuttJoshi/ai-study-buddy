@@ -140,16 +140,40 @@ streamlit run app.py --server.port 8501
 - **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 
-For detailed setup instructions, see [SETUP.md](SETUP.md)
+### 6. View Database (Optional)
+
+**Windows:**
+```cmd
+start_db_viewer.bat
+```
+
+**Ubuntu/Linux/macOS:**
+```bash
+./start_db_viewer.sh
+```
+
+Then open in browser: **http://localhost:8080**
+
+For detailed setup instructions, see [SETUP.md](docs/SETUP.md)
 
 ---
 
 ## 📖 Documentation
 
-- **[SETUP.md](SETUP.md)** - Detailed setup and installation guide
-- **[projectRequirementDevelopment.md](projectRequirementDevelopment.md)** - Complete development roadmap
-- **[backend/PHASE1_TASKS.txt](backend/PHASE1_TASKS.txt)** - Backend Phase 1 tasks
-- **[frontend/PHASE1_TASKS.txt](frontend/PHASE1_TASKS.txt)** - Frontend Phase 1 tasks
+All documentation is organized in the [`docs/`](docs/) folder:
+
+- **[SETUP.md](docs/SETUP.md)** - Detailed setup and installation guide
+- **[projectRequirementDevelopment.md](docs/projectRequirementDevelopment.md)** - Complete development roadmap
+- **[PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)** - Project organization guide
+- **[DATABASE_SETUP.md](docs/DATABASE_SETUP.md)** - Database configuration guide
+- **[DATABASE_VIEWER.md](docs/DATABASE_VIEWER.md)** - Database viewer tool guide
+
+## 📋 Tasks
+
+Team tasks are organized in the [`tasks/`](tasks/) folder:
+
+- **[Backend Tasks](tasks/backend/BACKEND_PHASE1_TASKS.txt)** - Backend Phase 1 tasks
+- **[Frontend Tasks](tasks/frontend/)** - Frontend Phase 1 tasks (to be created)
 
 ---
 
@@ -157,19 +181,36 @@ For detailed setup instructions, see [SETUP.md](SETUP.md)
 
 ```
 ai-study-buddy/
-├── backend/              # FastAPI backend
+├── backend/                    # FastAPI backend
 │   ├── app/
-│   │   ├── routers/     # Feature-based API routes
-│   │   ├── database.py  # Database configuration
-│   │   └── models.py    # Database models
-│   └── main.py          # App entry point
+│   │   ├── models/            # Database models (organized by entity)
+│   │   │   ├── user.py        # User model
+│   │   │   └── __init__.py
+│   │   ├── routers/           # API routes (organized by feature)
+│   │   │   └── __init__.py
+│   │   ├── database.py        # Database configuration
+│   │   └── __init__.py
+│   └── main.py                # App entry point
 │
-├── frontend/             # Streamlit frontend
-│   ├── pages/           # Feature pages
-│   ├── utils/           # Utilities
-│   └── app.py           # App entry point
+├── frontend/                   # Streamlit frontend
+│   ├── pages/                 # Feature pages (to be created)
+│   ├── utils/                 # Utilities (to be created)
+│   └── app.py                 # App entry point
 │
-└── requirements.txt      # Dependencies
+├── docs/                       # Documentation
+│   ├── SETUP.md               # Setup guide
+│   ├── PROJECT_STRUCTURE.md   # Structure guide
+│   ├── DATABASE_SETUP.md      # Database guide
+│   ├── DATABASE_VIEWER.md     # DB viewer guide
+│   └── projectRequirementDevelopment.md  # Project plan
+│
+├── tasks/                      # Team tasks
+│   ├── backend/               # Backend tasks
+│   └── frontend/              # Frontend tasks
+│
+├── requirements.txt            # Python dependencies
+├── start_db_viewer.sh/.bat    # Database viewer scripts
+└── README.md                   # This file
 ```
 
 ---
@@ -302,11 +343,12 @@ This project is for educational purposes.
 
 ## 📞 Support
 
-For setup help, see [SETUP.md](SETUP.md)
+For setup help, see [SETUP.md](docs/SETUP.md)
 
 For development tasks, see:
-- Backend: [backend/PHASE1_TASKS.txt](backend/PHASE1_TASKS.txt)
-- Frontend: [frontend/PHASE1_TASKS.txt](frontend/PHASE1_TASKS.txt)
+- Backend: [tasks/backend/](tasks/backend/)
+- Frontend: [tasks/frontend/](tasks/frontend/)
+- Database: [DATABASE_SETUP.md](docs/DATABASE_SETUP.md)
 
 ---
 
