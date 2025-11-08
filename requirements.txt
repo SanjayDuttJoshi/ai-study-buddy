@@ -1,10 +1,15 @@
+setuptools>=65.0.0
+wheel>=0.38.0
+
 
 # Backend Framework
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 
 # Frontend Framework
-streamlit==1.30.0
+streamlit==1.25.0
+
+numpy==1.23.5
 
 # Environment Variables
 python-dotenv==1.0.0
@@ -14,10 +19,10 @@ sqlalchemy==2.0.25
 alembic==1.13.1
 
 # Validation
-pydantic==2.5.3
+pydantic==1.10.13
 
 # Password Hashing
-bcrypt==4.1.2
+bcrypt==3.2.2
 
 # HTTP Requests (for frontend API calls)
 requests==2.31.0
